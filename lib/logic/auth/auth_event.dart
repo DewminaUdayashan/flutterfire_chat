@@ -53,3 +53,5 @@ class AuthActiveStatusChanged extends AuthEvent {
   @override
   List<Object> get props => [appStatus];
 }
+
+class AuthChangeProfileImage extends AuthEvent {}

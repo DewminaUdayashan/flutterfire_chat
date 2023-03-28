@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'auth_bloc.dart';
 
 abstract class AuthState extends Equatable {
@@ -15,7 +14,7 @@ class Authenticating extends AuthState {}
 class Authenticated extends AuthState {
   final bool verifiedUser;
   final Exception? verificationException;
-  final User? user;
+  final UserModel? user;
 
   const Authenticated({
     this.user,
@@ -33,7 +32,7 @@ class Authenticated extends AuthState {
   Authenticated copyWith({
     bool? verifiedUser,
     Exception? verificationException,
-    User? user,
+    UserModel? user,
   }) {
     return Authenticated(
       user: user ?? this.user,
