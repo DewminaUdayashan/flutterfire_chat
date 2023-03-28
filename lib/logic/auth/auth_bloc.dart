@@ -26,6 +26,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ReloadAuth>(_onReloadAuth);
     on<GoogleSignIn>(_googleSignIn);
     on<ResetAuth>(_onResetAuth);
+    on<AuthActiveStatusChanged>(_onActiveStatusChanged);
 
     /// listening for user stream for changes
     _initializeAuthentication();
@@ -155,5 +156,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> close() {
     _userSubscription.cancel();
     return super.close();
+  }
+
+  FutureOr<void> _onActiveStatusChanged(
+      AuthActiveStatusChanged event, Emitter<AuthState> emit) {
+    _authServices.changeActiveStatus(event.appStatus.isActive);
   }
 }

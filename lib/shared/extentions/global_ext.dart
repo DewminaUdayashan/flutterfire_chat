@@ -1,3 +1,7 @@
+import 'package:chatty_chat/models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
 import '../enums.dart';
 
 extension EmailValidationExt on String {
@@ -32,4 +36,22 @@ extension AuthTypeExt on AuthType {
         return false;
     }
   }
+}
+
+extension FirebaseUserExtentions on User {
+  UserModel toFirestoreUser({required bool isActive}) => UserModel(
+        email: email ?? '',
+        name: displayName,
+        photoUrl: photoURL,
+        isActive: isActive,
+      );
+}
+
+extension AppStatusExt on AppStatus {
+  bool get isActive => this == AppStatus.online;
+}
+
+extension AppStatusExt2 on AppLifecycleState {
+  AppStatus get toAppStatus =>
+      this == AppLifecycleState.resumed ? AppStatus.online : AppStatus.offline;
 }
