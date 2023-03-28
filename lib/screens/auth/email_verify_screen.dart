@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../logic/auth/auth_bloc.dart';
-import '../../services/auth_services.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
   const VerifyEmailScreen({Key? key}) : super(key: key);
@@ -55,9 +54,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen>
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: waiting
-                  ? () {
-                      print(AuthServices().currentUser?.emailVerified);
-                    }
+                  ? null
                   : () {
                       setState(() {
                         waiting = true;

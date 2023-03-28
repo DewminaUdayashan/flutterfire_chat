@@ -1,10 +1,15 @@
+import 'package:chatty_chat/services/firestore_services.dart';
+import 'package:chatty_chat/shared/extentions/global_ext.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter_result/flutter_result.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthServices {
+  final FirestoreServices _firestoreServices;
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  AuthServices(this._firestoreServices);
 
   Future<Result<User, Exception>> loginWithEmailAndPassword(
       String email, String password) async {
@@ -21,21 +26,34 @@ class AuthServices {
 
   Future<Result<User, Exception>> googleSignIn() async {
     final googleSignIn = GoogleSignIn.standard();
+    late final AuthCredential credential;
     try {
-      late final AuthCredential credential;
-
+      ///sign in using google account
       final googleUser = await googleSignIn.signIn();
       final googleAuth = await googleUser!.authentication;
+
+      ///create credential object from google auth
       credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
+      ///sign in using created credential
       final UserCredential userCredential =
           await _auth.signInWithCredential(credential);
-      return Result.success(userCredential.user);
+
+      ///new user
+      final user = userCredential.user;
+
+      ///if user is new and [user] is not null, we have to create record in
+      ///firestore to store user's data
+      if ((userCredential.additionalUserInfo?.isNewUser ?? false) &&
+          user != null) {
+        _firestoreServices.saveUserToFirestore(
+            userId: user.uid, user: user.toFirestoreUser(isActive: true));
+      }
+      return Result.success(user);
     } on Exception catch (e) {
-      print(e);
       return Result.error(e);
     }
   }
@@ -48,6 +66,17 @@ class AuthServices {
         email: email,
         password: password,
       );
+
+      ///new user
+      final user = userCredential.user;
+
+      ///if user is new and [user] is not null, we have to create record in
+      ///firestore to store user's data
+      if ((userCredential.additionalUserInfo?.isNewUser ?? false) &&
+          user != null) {
+        _firestoreServices.saveUserToFirestore(
+            userId: user.uid, user: user.toFirestoreUser(isActive: true));
+      }
       return Result.success(userCredential.user);
     } catch (e) {
       return Result.error(e as Exception);
@@ -55,14 +84,8 @@ class AuthServices {
   }
 
   Future<Result<bool, Exception>> sendEmailVerification() async {
-    await _auth.currentUser?.sendEmailVerification();
-    final linkData = await FirebaseDynamicLinks.instance.onLink.first;
-
     try {
-      final code = linkData.link.queryParameters['oobCode']!;
-      await _auth.checkActionCode(code);
-      await _auth.applyActionCode(code);
-      await _auth.currentUser?.reload();
+      await _auth.currentUser?.sendEmailVerification();
       return Result.success(true);
     } on Exception catch (err) {
       return Result.error(err);
@@ -74,7 +97,6 @@ class AuthServices {
       await currentUser?.reload();
       return Result.success(currentUser);
     } on Exception catch (e) {
-      print(e);
       return Result.error(e);
     }
   }
@@ -91,5 +113,12 @@ class AuthServices {
 
   void signOut() {
     _auth.signOut();
+    changeActiveStatus(false);
+  }
+
+  void changeActiveStatus(bool isActive) {
+    if (currentUser != null) {
+      _firestoreServices.changeActiveStatus(isActive, currentUser!.uid);
+    }
   }
 }

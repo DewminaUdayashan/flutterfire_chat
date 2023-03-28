@@ -44,3 +44,12 @@ class ResetAuth extends AuthEvent {
   @override
   List<Object> get props => [email];
 }
+
+class AuthActiveStatusChanged extends AuthEvent {
+  final AppStatus appStatus;
+
+  const AuthActiveStatusChanged(this.appStatus);
+
+  @override
+  List<Object> get props => [appStatus];
+}

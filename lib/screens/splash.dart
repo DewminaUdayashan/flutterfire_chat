@@ -1,9 +1,9 @@
+import 'package:chatty_chat/screens/chat/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../logic/auth/auth_bloc.dart';
 import 'auth/email_verify_screen.dart';
-import 'auth/profile_screen.dart';
 import 'auth/sign_in_screen.dart';
 
 class Splash extends StatelessWidget {
@@ -41,11 +41,10 @@ class Splash extends StatelessWidget {
       bloc: context.read<AuthBloc>(),
       builder: (context, state) {
         if (state is Authenticated) {
-          print('From UI ${state.verifiedUser}');
           if (!state.verifiedUser) {
             return const VerifyEmailScreen();
           }
-          return const Profile();
+          return const ChatScreen();
         }
         return const SignInScreen();
       },
