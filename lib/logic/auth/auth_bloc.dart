@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:chatty_chat/models/user_model.dart';
+import 'package:chatty_chat/services/storage_services.dart';
 import 'package:chatty_chat/shared/extentions/global_ext.dart';
+import 'package:chatty_chat/shared/utils/image_util.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_result/flutter_result.dart';
@@ -14,7 +17,8 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthServices _authServices;
-  AuthBloc(this._authServices)
+  final StorageServices _storageServices;
+  AuthBloc(this._authServices, this._storageServices)
       : super(_authServices.currentUser != null
             ? Authenticated(
                 verifiedUser: _authServices.currentUser?.emailVerified ?? false)
@@ -27,12 +31,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<GoogleSignIn>(_googleSignIn);
     on<ResetAuth>(_onResetAuth);
     on<AuthActiveStatusChanged>(_onActiveStatusChanged);
+    on<AuthChangeProfileImage>(_onAuthChangeProfileImage);
 
     /// listening for user stream for changes
     _initializeAuthentication();
   }
 
   late StreamSubscription _userSubscription;
+  late UserModel user;
 
   FutureOr<void> _initializeAuthentication() async {
     _userSubscription = _authServices.authStateStream().listen((user) {
@@ -111,13 +117,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   /// not validated the email
 
   FutureOr<void> _onUserAuthenticated(
-      UserAuthenticated event, Emitter<AuthState> emit) {
-    emit(
-      Authenticated(
-        verifiedUser: _authServices.isEmailVerified,
-        user: _authServices.currentUser,
+      UserAuthenticated event, Emitter<AuthState> emit) async {
+    /// since the most recent edits are available in the firestore,
+    /// we have to get latest changes from db whenever it is necessary
+    final result = await _authServices.getFirestoreUser();
+    result.open(
+      (user) => emit(
+        Authenticated(
+          verifiedUser: _authServices.isEmailVerified,
+          user: user,
+        ),
+      ),
+      (onError) => emit(
+        Authenticated(
+          verifiedUser: _authServices.isEmailVerified,
+          user: _authServices.currentUser?.toFirestoreUser(isActive: true),
+        ),
       ),
     );
+    // emit(
+    //   Authenticated(
+    //     verifiedUser: _authServices.isEmailVerified,
+    //     user: _authServices.currentUser?.toFirestoreUser(isActive: true),
+    //   ),
+    // );
   }
 
   /// this method will trigger when app state resumed.
@@ -131,10 +154,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       /// verification details
       final result = await _authServices.reloadAuth();
 
+      /// since the most recent edits are available in the firestore,
+      /// we have to get latest changes from db whenever it is necessary
+      final fResult = await _authServices.getFirestoreUser();
+
       ///then, we can emit the state if there is any changes
       result.open(
         (user) => emit(currentState.copyWith(
-          user: user,
+          /// pass firestore user as the user, if it is null, pass the auth user
+          user: fResult.value ?? user?.toFirestoreUser(isActive: true),
           verifiedUser: user?.emailVerified,
         )),
         (onError) => emit(
@@ -152,14 +180,37 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _authServices.sendPasswordResetEmail(event.email);
   }
 
+  FutureOr<void> _onActiveStatusChanged(
+      AuthActiveStatusChanged event, Emitter<AuthState> emit) {
+    _authServices.changeActiveStatus(event.appStatus.isActive);
+  }
+
+  FutureOr<void> _onAuthChangeProfileImage(
+      AuthChangeProfileImage event, Emitter<AuthState> emit) async {
+    final userId = _authServices.currentUser?.uid;
+    try {
+      final file = await ImageUtil.pickImage();
+      if (file != null && userId != null) {
+        final result = await _storageServices.saveProfileImage(file, userId);
+        result.open((url) {
+          if (url != null) {
+            _authServices.updateUserProfileImageUrl(userId, url);
+
+            ///adding event to reload the changes from firestore db
+            add(UserAuthenticated());
+          } else {
+            print('Url not received!');
+          }
+        }, (onError) => print(onError));
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Future<void> close() {
     _userSubscription.cancel();
     return super.close();
-  }
-
-  FutureOr<void> _onActiveStatusChanged(
-      AuthActiveStatusChanged event, Emitter<AuthState> emit) {
-    _authServices.changeActiveStatus(event.appStatus.isActive);
   }
 }

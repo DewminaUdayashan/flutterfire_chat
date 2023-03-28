@@ -1,3 +1,4 @@
+import 'package:chatty_chat/models/user_model.dart';
 import 'package:chatty_chat/services/firestore_services.dart';
 import 'package:chatty_chat/shared/extentions/global_ext.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -120,5 +121,13 @@ class AuthServices {
     if (currentUser != null) {
       _firestoreServices.changeActiveStatus(isActive, currentUser!.uid);
     }
+  }
+
+  Future<void> updateUserProfileImageUrl(String userId, String url) async {
+    _firestoreServices.updateUserProfileImageUrl(userId, url);
+  }
+
+  Future<Result<UserModel, Exception>> getFirestoreUser() async {
+    return _firestoreServices.getFirestoreUser(_auth.currentUser?.uid ?? '');
   }
 }

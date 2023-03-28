@@ -1,5 +1,6 @@
 import 'package:chatty_chat/services/auth_services.dart';
 import 'package:chatty_chat/services/firestore_services.dart';
+import 'package:chatty_chat/services/storage_services.dart';
 import 'package:chatty_chat/shared/observer.dart';
 import 'package:chatty_chat/shared/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
             AuthServices(
               FirestoreServices(),
             ),
+            StorageServices(),
           ),
         ),
       ],
