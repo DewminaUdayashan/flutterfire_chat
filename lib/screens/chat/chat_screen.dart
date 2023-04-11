@@ -63,10 +63,13 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
               slivers: [
                 BlocBuilder<AuthBloc, AuthState>(
                   builder: (context, state) {
-                    return SliverAppBar.large(
+                    return SliverAppBar.medium(
                       backgroundColor:
                           Theme.of(context).colorScheme.secondaryContainer,
-                      title: const Text('Chatty'),
+                      title: Text(
+                        'Chatty',
+                        style: context.textTheme.headlineSmall,
+                      ),
                       actions: [
                         if (state is Authenticated)
                           Material(

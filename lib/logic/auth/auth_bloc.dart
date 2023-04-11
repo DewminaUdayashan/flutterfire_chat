@@ -7,6 +7,7 @@ import 'package:chatty_chat/shared/extentions/global_ext.dart';
 import 'package:chatty_chat/shared/utils/image_util.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_result/flutter_result.dart';
 
 import '../../services/auth_services.dart';
@@ -181,8 +182,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  FutureOr<void> _googleSignIn(GoogleSignIn event, Emitter<AuthState> emit) {
-    _authServices.googleSignIn();
+  FutureOr<void> _googleSignIn(
+      GoogleSignIn event, Emitter<AuthState> emit) async {
+    event.onLoading();
+    await _authServices.googleSignIn();
+    event.onDone();
   }
 
   FutureOr<void> _onResetAuth(ResetAuth event, Emitter<AuthState> emit) {

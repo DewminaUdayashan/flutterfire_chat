@@ -63,10 +63,9 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   UserModel getUserForChat(Chat chat, UsersLoaded userState, String myId) {
-    final receiverId =
-        chat.participants.where((element) => element != myId).first;
+    final receiverId = chat.participants.where((id) => id != myId).first;
     final filtered =
-        userState.users.where((element) => element.id == receiverId).toList();
+        userState.users.where((user) => user.id == receiverId).toList();
     if (filtered.isNotEmpty) {
       return filtered.first;
     } else {

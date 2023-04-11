@@ -25,7 +25,7 @@ extension AuthTypeExt on AuthType {
       case AuthType.login:
         return 'Login';
       default:
-        return 'Sign In';
+        return 'Sign in';
     }
   }
 
@@ -77,6 +77,8 @@ extension LastSeen on DateTime {
       return formatter.format(this);
     }
   }
+
+  String get time => DateFormat('HH:mm').format(this);
 }
 
 extension ChatTypeExt on ChatType {
