@@ -1,6 +1,7 @@
 import 'package:chatty_chat/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../enums.dart';
 
@@ -54,4 +55,41 @@ extension AppStatusExt on AppStatus {
 extension AppStatusExt2 on AppLifecycleState {
   AppStatus get toAppStatus =>
       this == AppLifecycleState.resumed ? AppStatus.online : AppStatus.offline;
+}
+
+extension LastSeen on DateTime {
+  String get lastSeen {
+    final now = DateTime.now();
+    final difference = now.difference(this);
+
+    if (difference.inSeconds < 2) {
+      return "Online";
+    } else if (difference.inSeconds < 60) {
+      return "Just now";
+    } else if (difference.inMinutes < 60) {
+      return "${difference.inMinutes}m ago";
+    } else if (difference.inHours < 24) {
+      return "${difference.inHours}h ago";
+    } else if (difference.inDays < 7) {
+      return "${difference.inDays}d ago";
+    } else {
+      final formatter = DateFormat('dd MMM yyyy');
+      return formatter.format(this);
+    }
+  }
+}
+
+extension ChatTypeExt on ChatType {
+  int get type => this == ChatType.private ? 1 : 2;
+}
+
+extension ChatTypeExt2 on int {
+  ChatType get fromMap => this == 1 ? ChatType.private : ChatType.group;
+}
+
+extension ThemeExt on BuildContext {
+  TextTheme get textTheme => Theme.of(this).textTheme;
+  ColorScheme get theme => Theme.of(this).colorScheme;
+  double get width => MediaQuery.of(this).size.width;
+  double get height => MediaQuery.of(this).size.height;
 }

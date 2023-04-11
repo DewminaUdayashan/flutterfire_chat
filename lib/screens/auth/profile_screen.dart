@@ -27,11 +27,13 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.small(
+      floatingActionButton: FloatingActionButton.extended(
+        label: const Text('Sign Out'),
         onPressed: () {
           context.read<AuthBloc>().add(SignOut());
         },
       ),
+      appBar: AppBar(),
       body: SafeArea(
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
@@ -44,12 +46,9 @@ class _ProfileState extends State<Profile> {
                     child: Material(
                       child: InkWell(
                         onTap: () async {
-                          // final pFile = await ImageUtil.pickImage();
-                          // file = pFile;
-                          // setState(() {});
-                          context
-                              .read<AuthBloc>()
-                              .add(AuthChangeProfileImage());
+                          context.read<AuthBloc>().add(
+                                AuthChangeProfileImage(),
+                              );
                         },
                         borderRadius: BorderRadius.circular(100),
                         child: Ink(
@@ -57,7 +56,7 @@ class _ProfileState extends State<Profile> {
                           height: 175,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.green,
+                            color: Colors.transparent,
                             border: Border.all(
                               color: Colors.blue,
                               width: 5,
@@ -73,7 +72,10 @@ class _ProfileState extends State<Profile> {
                           ),
                           child: state.user?.photoUrl == null
                               ? const Center(
-                                  child: CircularProgressIndicator(),
+                                  child: Icon(
+                                    Icons.account_circle_rounded,
+                                    size: 60,
+                                  ),
                                 )
                               : null,
                         ),
@@ -81,17 +83,26 @@ class _ProfileState extends State<Profile> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  EditableText(
-                    controller: nameController..text = state.user?.name ?? '',
-                    focusNode: nameFocusNode,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 30,
+                  if (state.user?.name == null) ...[
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 25),
+                      child: TextField(
+                        decoration:
+                            InputDecoration(hintText: 'Write your name here!'),
+                      ),
                     ),
-                    cursorColor: Colors.blue,
-                    backgroundCursorColor: Colors.transparent,
-                    textAlign: TextAlign.center,
-                  ),
+                  ] else
+                    EditableText(
+                      controller: nameController..text = state.user?.name ?? '',
+                      focusNode: nameFocusNode,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 30,
+                      ),
+                      cursorColor: Colors.blue,
+                      backgroundCursorColor: Colors.transparent,
+                      textAlign: TextAlign.center,
+                    ),
                   const SizedBox(height: 20),
                   if (file != null)
                     Image.file(

@@ -1,9 +1,9 @@
 import 'package:chatty_chat/screens/chat/chat_screen.dart';
+import 'package:chatty_chat/shared/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../logic/auth/auth_bloc.dart';
-import 'auth/email_verify_screen.dart';
 import 'auth/sign_in_screen.dart';
 
 class Splash extends StatelessWidget {
@@ -37,16 +37,20 @@ class Splash extends StatelessWidget {
               ),
             );
         }
+        if (state is NotAuthenticated) {
+          Navigator.pushReplacementNamed(context, Routes.splash);
+        }
       },
       bloc: context.read<AuthBloc>(),
       builder: (context, state) {
         if (state is Authenticated) {
-          if (!state.verifiedUser) {
-            return const VerifyEmailScreen();
-          }
+          // if (!state.verifiedUser) {
+          //   return const VerifyEmailScreen();
+          // }
           return const ChatScreen();
+        } else {
+          return const SignInScreen();
         }
-        return const SignInScreen();
       },
     );
   }
