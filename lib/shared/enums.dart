@@ -7,3 +7,8 @@ enum AppStatus {
   online,
   offline,
 }
+
+enum ChatType {
+  private,
+  group,
+}

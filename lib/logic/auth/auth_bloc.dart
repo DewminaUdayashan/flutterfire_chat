@@ -38,7 +38,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   late StreamSubscription _userSubscription;
-  late UserModel user;
+  late UserModel? user;
 
   FutureOr<void> _initializeAuthentication() async {
     _userSubscription = _authServices.authStateStream().listen((user) {
@@ -106,8 +106,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   /// firebase auth plugin and [_initializeAuthentication] will handle the
   /// emitting fo the correct state
   FutureOr<void> _onSignOut(SignOut event, Emitter<AuthState> emit) {
-    _authServices.signOut();
     emit(NotAuthenticated());
+    _authServices.signOut();
   }
 
   /// [UserAuthenticated] event will be passed from [_initializeAuthentication] method
@@ -122,12 +122,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     /// we have to get latest changes from db whenever it is necessary
     final result = await _authServices.getFirestoreUser();
     result.open(
-      (user) => emit(
-        Authenticated(
-          verifiedUser: _authServices.isEmailVerified,
-          user: user,
-        ),
-      ),
+      (user) {
+        this.user = user;
+        emit(
+          Authenticated(
+            verifiedUser: _authServices.isEmailVerified,
+            user: user,
+          ),
+        );
+      },
       (onError) => emit(
         Authenticated(
           verifiedUser: _authServices.isEmailVerified,
@@ -160,11 +163,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       ///then, we can emit the state if there is any changes
       result.open(
-        (user) => emit(currentState.copyWith(
-          /// pass firestore user as the user, if it is null, pass the auth user
-          user: fResult.value ?? user?.toFirestoreUser(isActive: true),
-          verifiedUser: user?.emailVerified,
-        )),
+        (user) {
+          this.user = fResult.value ?? user?.toFirestoreUser(isActive: true);
+
+          emit(
+            currentState.copyWith(
+              /// pass firestore user as the user, if it is null, pass the auth user
+              user: fResult.value ?? user?.toFirestoreUser(isActive: true),
+              verifiedUser: user?.emailVerified,
+            ),
+          );
+        },
         (onError) => emit(
           currentState.copyWith(verificationException: onError),
         ),

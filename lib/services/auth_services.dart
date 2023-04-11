@@ -9,6 +9,7 @@ class AuthServices {
   final FirestoreServices _firestoreServices;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _googleSignIn = GoogleSignIn.standard();
 
   AuthServices(this._firestoreServices);
 
@@ -26,11 +27,10 @@ class AuthServices {
   }
 
   Future<Result<User, Exception>> googleSignIn() async {
-    final googleSignIn = GoogleSignIn.standard();
     late final AuthCredential credential;
     try {
       ///sign in using google account
-      final googleUser = await googleSignIn.signIn();
+      final googleUser = await _googleSignIn.signIn();
       final googleAuth = await googleUser!.authentication;
 
       ///create credential object from google auth
@@ -112,12 +112,13 @@ class AuthServices {
 
   bool get isEmailVerified => currentUser?.emailVerified ?? false;
 
-  void signOut() {
+  Future<void> signOut() async {
+    await _googleSignIn.disconnect();
     _auth.signOut();
     changeActiveStatus(false);
   }
 
-  void changeActiveStatus(bool isActive) {
+  Future<void> changeActiveStatus(bool isActive) async {
     if (currentUser != null) {
       _firestoreServices.changeActiveStatus(isActive, currentUser!.uid);
     }

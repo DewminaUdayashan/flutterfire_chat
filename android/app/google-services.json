@@ -1,20 +1,20 @@
 {
   "project_info": {
-    "project_number": "989025881997",
-    "project_id": "chatty-chat-26948",
-    "storage_bucket": "chatty-chat-26948.appspot.com"
+    "project_number": "1089568768814",
+    "project_id": "chatty-chat-c2468",
+    "storage_bucket": "chatty-chat-c2468.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:989025881997:android:62c9b3a0ad338ddd2fb7c4",
+        "mobilesdk_app_id": "1:1089568768814:android:1b59827584f8afe9f2b0bf",
         "android_client_info": {
           "package_name": "com.example.chatty_chat"
         }
       },
       "oauth_client": [
         {
-          "client_id": "989025881997-22uiefv3ppfb3flpfh0ccfeoutj46g08.apps.googleusercontent.com",
+          "client_id": "1089568768814-0e2lbj69187odio594mjk12qpinsjfn4.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.chatty_chat",
@@ -22,20 +22,20 @@
           }
         },
         {
-          "client_id": "989025881997-3l4anqqse08lgubbumrmk9oqhcsau8le.apps.googleusercontent.com",
+          "client_id": "1089568768814-t8mk1dqobc73u5571348jdnlnc0fn8rc.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC3mZAt-flOpp57fMKQ9eBPItNFYDWeVp4"
+          "current_key": "AIzaSyCcyUIphdpXSSkZssMPCxknJGI4rkv88D4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "989025881997-3l4anqqse08lgubbumrmk9oqhcsau8le.apps.googleusercontent.com",
+              "client_id": "1089568768814-t8mk1dqobc73u5571348jdnlnc0fn8rc.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
