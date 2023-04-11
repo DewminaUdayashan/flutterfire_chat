@@ -1,3 +1,4 @@
+import 'package:chatty_chat/shared/extentions/global_ext.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../models/message.dart';
@@ -20,7 +21,7 @@ class MessageItem extends StatelessWidget {
       children: [
         Container(
           margin: const EdgeInsets.only(top: 12),
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
               bottomRight: Radius.circular(!outgoingMessage ? 50 : 0),
@@ -30,10 +31,23 @@ class MessageItem extends StatelessWidget {
             ),
             color: Theme.of(context).colorScheme.primaryContainer,
           ),
-          child: Text(
-            msg.text,
-            textAlign: outgoingMessage ? TextAlign.right : TextAlign.left,
-            style: const TextStyle(fontSize: 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: outgoingMessage
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
+            children: [
+              Text(
+                msg.text,
+                textAlign: outgoingMessage ? TextAlign.right : TextAlign.left,
+                style: const TextStyle(fontSize: 18),
+              ),
+              Text(
+                msg.sentAt.time,
+                textAlign: outgoingMessage ? TextAlign.right : TextAlign.left,
+                style: const TextStyle(fontSize: 10, color: Colors.black45),
+              ),
+            ],
           ),
         ),
       ],

@@ -16,6 +16,8 @@ class SignIn extends AuthEvent {
     required this.email,
     required this.password,
     required this.authType,
+    required void Function() onLoading,
+    required void Function() onDone,
   });
 
   @override
@@ -30,7 +32,14 @@ class VerifyEmail extends AuthEvent {}
 
 class UserAuthenticated extends AuthEvent {}
 
-class GoogleSignIn extends AuthEvent {}
+class GoogleSignIn extends AuthEvent {
+  final VoidCallback onLoading;
+  final VoidCallback onDone;
+  const GoogleSignIn({
+    required this.onLoading,
+    required this.onDone,
+  });
+}
 
 class SignOut extends AuthEvent {}
 

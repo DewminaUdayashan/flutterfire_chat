@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chatty_chat/shared/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -30,6 +31,7 @@ class _ProfileState extends State<Profile> {
       floatingActionButton: FloatingActionButton.extended(
         label: const Text('Sign Out'),
         onPressed: () {
+          Navigator.pushReplacementNamed(context, Routes.splash);
           context.read<AuthBloc>().add(SignOut());
         },
       ),

@@ -57,7 +57,7 @@ class ChatItem extends StatelessWidget {
           ),
         ],
       ),
-      title: Text(user.name ?? ''),
+      title: Text(user.name ?? user.email),
       subtitle: Text(lastMessage),
       trailing: Icon(
         chat.lastMessage.readers.contains(user.id)

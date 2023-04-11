@@ -1,4 +1,3 @@
-import 'package:chatty_chat/screens/chat/chat_screen.dart';
 import 'package:chatty_chat/shared/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,6 +24,7 @@ class Splash extends StatelessWidget {
                 ),
               );
           }
+          Navigator.pushReplacementNamed(context, Routes.chat);
         }
         if (state is AuthenticationFailed) {
           ScaffoldMessenger.of(context)
@@ -47,7 +47,7 @@ class Splash extends StatelessWidget {
           // if (!state.verifiedUser) {
           //   return const VerifyEmailScreen();
           // }
-          return const ChatScreen();
+          return const SizedBox.shrink();
         } else {
           return const SignInScreen();
         }
